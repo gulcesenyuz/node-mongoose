@@ -7,19 +7,34 @@ const connect = mongoose.connect(url);
 connect.then((db) => {
     console.log('Connected correctly to server');
 
+
     Dishes.create({
-        name: 'NewPizza',
-        description: ' new description',
+        name: 'pizza',
+        description: 'new description'
     })
         .then((dish) => {
             console.log(dish);
-            // The exec will ensure that this is executed and that 
-            //it will return a promise and so that promise will be returned 
-            //so that it can then chain the method to the remaining ones.
-            return Dishes.find({}).exec();
+
+            return Dishes.findByIdAndUpdate(dish._id, {
+                $set: { description: 'Updated description' }
+            }, {
+                new: true
+            })
+                .exec();
         })
-        .then((dishes) => {
-            console.log(dishes);
+        .then((dish) => {
+            console.log(dish);
+
+            dish.comments.push({
+                rating: 5,
+                comment: 'So good!',
+                author: 'Gizem '
+            });
+
+            return dish.save();
+        })
+        .then((dish) => {
+            console.log(dish);
 
             return Dishes.remove({});
         })
@@ -28,7 +43,7 @@ connect.then((db) => {
         })
         .catch((err) => {
             console.log(err);
-        })
+        });
 
 
 });
